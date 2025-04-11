@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2048</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Clear+Sans:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container">
+        <div id="game-screen" class="game-screen hidden">
+            <div class="header">
+                <div class="score-box">
+                    <span>Điểm</span>
+                    <span id="score">0</span>
+                </div>
+            </div>
+            <div id="game-board"></div>
+            
+            <button id="start-button" class="restart-button" onclick="game.start()">Chơi</button>
+            <button id="restart-button" class="restart-button hidden1" onclick="game.reset()">Chơi lại</button>
+            <div class="backbtn"><a href="https://gamehubhocdungai.netlify.app/" class="back">Quay Lại</a></div>
+            <div id="game-over" class="game-over hidden">
+                <h2>Game Over!</h2>
+                <p>Điểm: <span id="final-score">0</span></p>
+                <button onclick="game.start()">Chơi lại</button>
+            </div>
+            <!-- Thêm các thẻ audio -->
+            <audio id="move-sound" src="./sounds/move.wav"></audio>
+            <audio id="merge-sound" src="./sounds/merge.wav"></audio>
+            <audio id="game-over-sound" src="./sounds/over.wav"></audio>
+            <audio id="button-sound" src="./sounds/click.wav"></audio>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
