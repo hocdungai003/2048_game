@@ -16,45 +16,25 @@ body {
 .game-container {
     text-align: center;
     padding: 20px;
-    max-width: 600px; /* Slightly smaller for a tighter frame */
-    width: 90%; /* Responsive width */
-    background: #faf8ef; /* Softer background color */
-    border-radius: 15px; /* Smoother corners */
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Lighter shadow */
+    max-width: 600px;
+    width: 90%;
+    background: #faf8ef;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
     position: relative;
     overflow: hidden;
-}
-
-/* Removed decorative background element for cleaner look */
-.game-container::before {
-    display: none;
-}
-
-.start-screen {
     display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
-    height: 100%;
-    animation: fadeIn 0.5s ease;
-}
-
-/* Removed h1 from start-screen since title is removed */
-.start-screen h1 {
-    display: none;
+    align-items: center;
+    min-height: 100vh;
 }
 
 .header {
     display: flex;
-    justify-content: flex-end; /* Move score to the right */
+    justify-content: flex-end;
     align-items: center;
     margin-bottom: 15px;
     padding: 0 15px;
-}
-
-/* Removed h1 from header since title is removed */
-.header h1 {
-    display: none;
 }
 
 .score-box {
@@ -85,18 +65,49 @@ body {
     position: relative;
     margin: 0 auto;
     padding: 6px;
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    grid-gap: 6px;
 }
 
-/* Moved restart button to below the game board */
 .restart-button {
+    background: #8f7a66;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    margin: 20px auto;
     display: block;
-    margin: 20px auto; /* Centered below game board */
+    width: 150px;
+    text-align: center;
 }
 
-/* Tile styles remain unchanged */
+.restart-button:hover {
+    background: #9f8b77;
+    transform: scale(1.05);
+}
+
+.back {
+    background: #c5bfb9;
+    color: #8a6b6b;
+    text-decoration: none;
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 5px;
+    display: inline-block;
+    width: 150px;
+    text-align: center;
+    transition: background 0.3s ease, transform 0.2s ease;
+    margin: 10px auto;
+}
+
+.back:hover {
+    background: #c0b5ac;
+    transform: scale(1.05);
+}
+
 .tile {
     position: absolute;
     width: 54px;
@@ -162,174 +173,6 @@ body {
 
 .game-over {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.85);
-    color: #fff;
-    padding: 40px;
-    border-radius: 15px;
-    text-align: center;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-}
-
-.game-over.hidden {
-    display: none;
-}
-
-.game-over h2 {
-    margin: 0 0 15px;
-    font-size: 36px;
-    letter-spacing: 1px;
-}
-
-.game-over p {
-    margin: 0 0 25px;
-    font-size: 22px;
-}
-
-.game-over button {
-    padding: 12px 30px;
-    font-size: 18px;
-    background: linear-gradient(45deg, #8f7a66, #a68b73);
-    color: #fff;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: background 0.2s ease, transform 0.2s ease;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-}
-
-.game-over button:hover {
-    background: linear-gradient(45deg, #9f8b77, #b69c88);
-    transform: translateY(-2px);
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@media (max-width: 500px) {
-    .game-container {
-        padding: 10px;
-        border-radius: 10px;
-    }
-
-    .start-screen button,
-    .restart-button {
-        padding: 10px 25px;
-        font-size: 16px;
-    }
-
-    .header {
-        padding: 0 10px;
-    }
-
-    .score-box {
-        padding: 8px 15px;
-    }
-
-    .score-box span:last-child {
-        font-size: 20px;
-    }
-
-    #game-board {
-        width: 325px;
-        height: 325px;
-    }
-
-    .tile {
-        width: 35px;
-        height: 35px;
-        font-size: 14px;
-    }
-
-    .tile[data-value="128"],
-    .tile[data-value="256"],
-    .tile[data-value="512"] { font-size: 12px; }
-
-    .tile[data-value="1024"],
-    .tile[data-value="2048"] { font-size: 10px; }
-
-    .game-over {
-        padding: 30px;
-    }
-
-    .game-over h2 {
-        font-size: 28px;
-    }
-
-    .game-over p {
-        font-size: 18px;
-    }
-
-    .game-over button {
-        padding: 10px 25px;
-        font-size: 16px;
-    }
-}
-
-
-
-
-
-
-
-
-
-
-/* Tổng thể container của game */
-.game-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    font-family: 'Clear Sans', sans-serif;
-}
-/* Header chứa điểm số */
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-/* Hộp điểm số */
-.score-box {
-    background: #bbada0;
-    color: #fff;
-    padding: 10px 20px;
-    border-radius: 5px;
-    text-align: center;
-    font-size: 18px;
-    font-weight: bold;
-}
-
-/* Nút chơi/chơi lại */
-.restart-button {
-    background: #8f7a66;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    font-size: 18px;
-    font-weight: bold;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s ease;
-    margin-top: 20px;
-    display: block;
-    width: 150px;
-    text-align: center;
-}
-
-.restart-button:hover {
-    background: #9f8b77;
-    transform: scale(1.05);
-}
-/* Game over screen */
-.game-over {
-    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
@@ -342,6 +185,11 @@ body {
     color: #fff;
     border-radius: 10px;
 }
+
+.game-over.hidden {
+    display: none;
+}
+
 .game-over h2 {
     font-size: 36px;
     margin-bottom: 20px;
@@ -368,27 +216,72 @@ body {
     background: #9f8b77;
 }
 
-.hidden1{
+.hidden1 {
     display: none;
 }
 
-.back {
-    background: #c5bfb9;
-    color: #8a6b6b;
-    text-decoration: none;
-    padding: 10px 20px;
-    font-size: 18px;
-    font-weight: bold;
-    border-radius: 5px;
-    display: inline-block;
-    width: 150px;
-    text-align: center;
-    transition: background 0.3s ease, transform 0.2s ease;
-    margin-top: 10px;
-}
+@media (max-width: 500px) {
+    .game-container {
+        padding: 10px;
+        border-radius: 10px;
+    }
 
-.back:hover {
-    background: #c0b5ac;
-    transform: scale(1.05);
-}
+    .restart-button,
+    .back {
+        padding: 10px 25px;
+        font-size: 16px;
+        width: 120px;
+    }
 
+    .header {
+        padding: 0 10px;
+    }
+
+    .score-box {
+        padding: 8px 15px;
+    }
+
+    .score-box span:last-child {
+        font-size: 20px;
+    }
+
+    #game-board {
+        width: 320px;
+        height: 320px;
+        padding: 6px;
+    }
+
+    .tile {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+
+    .tile[data-value="128"],
+    .tile[data-value="256"],
+    .tile[data-value="512"] {
+        font-size: 12px;
+    }
+
+    .tile[data-value="1024"],
+    .tile[data-value="2048"] {
+        font-size: 10px;
+    }
+
+    .game-over {
+        padding: 20px;
+    }
+
+    .game-over h2 {
+        font-size: 28px;
+    }
+
+    .game-over p {
+        font-size: 18px;
+    }
+
+    .game-over button {
+        padding: 10px 25px;
+        font-size: 16px;
+    }
+}

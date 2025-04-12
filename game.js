@@ -12,6 +12,9 @@ class Game2048 {
         this.finalScoreElement = document.getElementById('final-score');
         this.startScreen = document.getElementById('start-button'); // Có thể null
         this.gameScreen = document.getElementById('restart-button');
+        // New: Element for win/lose message
+        this.winElement = document.getElementById('win-message') || document.createElementогу
+
         this.isMoving = false;
         this.isMobile = window.innerWidth <= 500;
         this.tileSize = this.isMobile ? 35 : 54;
@@ -27,6 +30,9 @@ class Game2048 {
         if (this.mergeSound) this.mergeSound.volume = 0.7;
         if (this.gameOverSound) this.gameOverSound.volume = 0.6;
         if (this.buttonSound) this.buttonSound.volume = 0.5;
+        // Debounce variables
+        this.lastMoveTime = 0;
+        this.debounceDelay = 200; // Minimum delay between moves (ms)
         // Kiểm tra lỗi tải âm thanh
         this.checkAudioLoaded();
     }
@@ -37,8 +43,10 @@ class Game2048 {
         sounds.forEach((sound, index) => {
             if (sound) {
                 sound.addEventListener('error', () => {
+                    console.warn(`Lỗi tải âm thanh ${index}`);
                 });
                 sound.addEventListener('loadeddata', () => {
+                    // console.log(`Âm thanh ${index} đã tải`);
                 });
                 sound.currentTime = 0;
             }
@@ -55,11 +63,21 @@ class Game2048 {
         }
     }
 
+    // Debounce move to prevent rapid successive inputs
+    debounceMove(direction) {
+        const now = Date.now();
+        if (now - this.lastMoveTime >= this.debounceDelay) {
+            this.move(direction);
+            this.lastMoveTime = now;
+        }
+    }
+
     start() {
         this.playSound(this.buttonSound);
         this.startScreen.classList.add('hidden1');
         this.gameScreen.classList.remove('hidden1');
         this.init();
+        this.renderBoard(); // Explicitly render to show initial tiles
     }
 
     init() {
@@ -69,21 +87,34 @@ class Game2048 {
         this.mergedTiles.clear();
         this.newTiles.clear();
         this.updateScore();
-        this.renderBoard();
         this.addRandomTile(true);
         this.addRandomTile(true);
         this.setupControls();
         this.gameOverElement.classList.add('hidden');
+        if (this.winElement) this.winElement.classList.add('hidden');
         this.isMoving = false;
     }
 
     reset() {
         this.playSound(this.buttonSound);
         this.init();
+        this.renderBoard(); // Ensure board is rendered after reset
     }
 
     updateScore() {
         this.scoreElement.textContent = this.score;
+    }
+
+    // New: Check if 2048 tile exists
+    has2048() {
+        for (let i = 0; i < this.size; i++) {
+            for (let j = 0; j < this.size; j++) {
+                if (this.board[i][j] === 2048) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     renderBoard() {
@@ -104,7 +135,15 @@ class Game2048 {
                 const posX = j * tileDistance;
                 const posY = i * tileDistance;
 
-                tile.style.transition = 'transform 0.15s ease';
+                tile.style.transition = 'transform 0.15s ease, opacity 0.15s ease';
+
+                // Ensure new tiles start with opacity 0 for fade-in
+                if (this.newTiles.has(`${i},${j}`)) {
+                    tile.style.opacity = '0';
+                    tile.classList.add('new');
+                } else {
+                    tile.style.opacity = '1';
+                }
 
                 if (this.movingTiles.has(`${i},${j}`)) {
                     const [fromI, fromJ] = this.movingTiles.get(`${i},${j}`);
@@ -113,28 +152,30 @@ class Game2048 {
                     tile.style.transform = `translate(${fromX}px, ${fromY}px)`;
                     requestAnimationFrame(() => {
                         tile.style.transform = `translate(${posX}px, ${posY}px)`;
+                        if (this.newTiles.has(`${i},${j}`)) {
+                            tile.style.opacity = '1';
+                        }
                     });
                 } else if (this.mergedTiles.has(`${i},${j}`)) {
                     tile.style.transform = `translate(${posX}px, ${posY}px)`;
                     tile.classList.add('merged');
+                    tile.style.opacity = '1';
                 } else {
                     tile.style.transform = `translate(${posX}px, ${posY}px)`;
-                }
-
-                if (this.newTiles.has(`${i},${j}`)) {
-                    tile.classList.add('new');
+                    tile.style.opacity = '1';
                 }
 
                 this.gameBoard.appendChild(tile);
             }
         }
 
+        // Increased timeout to ensure animations complete
         setTimeout(() => {
             this.movingTiles.clear();
             this.mergedTiles.clear();
             this.newTiles.clear();
             this.isMoving = false;
-        }, 150);
+        }, 200);
     }
 
     addRandomTile(isNew = false) {
@@ -209,7 +250,7 @@ class Game2048 {
                     moved = true;
                     this.playSound(this.moveSound);
                 }
-                for (let i = 0; i < this.size; i++) newBoard[i][j] = result[i]; // Sửa lỗi từ newBoard[i] = result
+                for (let i = 0; i < this.size; i++) newBoard[i][j] = result[i];
                 moves.forEach(([from, to]) => this.movingTiles.set(`${to},${j}`, [from, j]));
                 merges.forEach(pos => this.mergedTiles.add(`${pos},${j}`));
             }
@@ -217,9 +258,13 @@ class Game2048 {
 
         if (moved) {
             this.board = newBoard;
+            this.updateScore(); // Update score display after move
             this.renderBoard();
-            setTimeout(() => this.addRandomTile(true), 150);
-            if (this.isGameOver()) {
+            setTimeout(() => this.addRandomTile(true), 200); // Match renderBoard timeout
+            // Check for 2048 win condition
+            if (this.has2048()) {
+                setTimeout(() => this.showWin(), 300);
+            } else if (this.isGameOver()) {
                 setTimeout(() => this.showGameOver(), 300);
             }
         } else {
@@ -293,9 +338,30 @@ class Game2048 {
         return true;
     }
 
+    // New: Show win message
+    showWin() {
+        if (this.winElement) {
+            this.winElement.textContent = 'You Win!';
+            this.winElement.classList.remove('hidden');
+        }
+        this.gameOverElement.classList.remove('hidden');
+        this.finalScoreElement.textContent = this.score;
+        this.playSound(this.gameOverSound);
+        this.isMoving = false;
+    }
+
     showGameOver() {
         this.finalScoreElement.textContent = this.score;
         this.gameOverElement.classList.remove('hidden');
+        // Check if 2048 was achieved
+        if (this.winElement) {
+            if (this.has2048()) {
+                this.winElement.textContent = 'You Win!';
+            } else {
+                this.winElement.textContent = 'You Lose!';
+            }
+            this.winElement.classList.remove('hidden');
+        }
         this.playSound(this.gameOverSound);
         this.isMoving = false;
     }
@@ -303,32 +369,36 @@ class Game2048 {
     setupControls() {
         document.addEventListener('keydown', (e) => {
             e.preventDefault();
-            if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') this.move('up');
-            if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') this.move('down');
-            if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') this.move('left');
-            if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') this.move('right');
+            if (e.key === 'ArrowUp' || e.key.toLowerCase() === 'w') this.debounceMove('up');
+            if (e.key === 'ArrowDown' || e.key.toLowerCase() === 's') this.debounceMove('down');
+            if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'a') this.debounceMove('left');
+            if (e.key === 'ArrowRight' || e.key.toLowerCase() === 'd') this.debounceMove('right');
         });
 
         let touchStartX = 0;
         let touchStartY = 0;
 
         this.gameBoard.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Prevent scrolling
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
         });
 
         this.gameBoard.addEventListener('touchend', (e) => {
+            e.preventDefault();
             const touchEndX = e.changedTouches[0].clientX;
             const touchEndY = e.changedTouches[0].clientY;
             const deltaX = touchEndX - touchStartX;
             const deltaY = touchEndY - touchStartY;
 
+            const minSwipeDistance = 50; // Increased for intentional swipes
+
             if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                if (deltaX > 50) this.move('right');
-                else if (deltaX < -50) this.move('left');
+                if (deltaX > minSwipeDistance) this.debounceMove('right');
+                else if (deltaX < -minSwipeDistance) this.debounceMove('left');
             } else {
-                if (deltaY > 50) this.move('down');
-                else if (deltaY < -50) this.move('up');
+                if (deltaY > minSwipeDistance) this.debounceMove('down');
+                else if (deltaY < -minSwipeDistance) this.debounceMove('up');
             }
         });
     }

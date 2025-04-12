@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="game-container">
-        <div id="game-screen" class="game-screen hidden">
+        <div id="game-screen" class="game-screen">
             <div class="header">
                 <div class="score-box">
                     <span>Điểm</span>
@@ -17,16 +17,17 @@
                 </div>
             </div>
             <div id="game-board"></div>
-            
             <button id="start-button" class="restart-button" onclick="game.start()">Chơi</button>
             <button id="restart-button" class="restart-button hidden1" onclick="game.reset()">Chơi lại</button>
-            <div class="backbtn"><a href="https://gamehubhocdungai.netlify.app/" class="back">Quay Lại</a></div>
-            <div id="game-over" class="game-over hidden">
-                <h2>Game Over!</h2>
-                <p>Điểm: <span id="final-score">0</span></p>
-                <button onclick="game.start()">Chơi lại</button>
+            <div class="backbtn">
+                <a href="https://gamehubhocdungai.netlify.app/" class="back">Quay Lại</a>
             </div>
-            <!-- Thêm các thẻ audio -->
+            <div id="game-over" class="game-over hidden">
+                <h2 id="win-message"></h2>
+                <p>Điểm: <span id="final-score">0</span></p>
+                <button onclick="game.reset()">Chơi lại</button>
+            </div>
+            <!-- Audio elements -->
             <audio id="move-sound" src="./sounds/move.wav"></audio>
             <audio id="merge-sound" src="./sounds/merge.wav"></audio>
             <audio id="game-over-sound" src="./sounds/over.wav"></audio>
