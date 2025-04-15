@@ -1,6 +1,6 @@
 class Game2048 {
     constructor() {
-        this.size = 8;
+        this.size = 6;
         this.board = [];
         this.score = 0;
         this.movingTiles = new Map();
@@ -17,9 +17,10 @@ class Game2048 {
 
         this.isMoving = false;
         this.isMobile = window.innerWidth <= 500;
-        this.tileSize = this.isMobile ? 35 : 54;
-        this.gap = 6;
-        this.gridSize = this.isMobile ? 320 : 480;
+
+        this.tileSize = this.isMobile ? 45 : 68; // Increased from 35/54 for better visibility
+        this.gap = 8; // Slightly larger gap for clarity
+        this.gridSize = this.isMobile ? 300 : 456; // 6 * (tileSize + gap)
         // Khởi tạo âm thanh
         this.moveSound = document.getElementById('move-sound');
         this.mergeSound = document.getElementById('merge-sound');
@@ -32,7 +33,7 @@ class Game2048 {
         if (this.buttonSound) this.buttonSound.volume = 0.5;
         // Debounce variables
         this.lastMoveTime = 0;
-        this.debounceDelay = 200; // Minimum delay between moves (ms)
+        this.debounceDelay = 150; // Minimum delay between moves (ms)
         // Kiểm tra lỗi tải âm thanh
         this.checkAudioLoaded();
     }
@@ -119,7 +120,6 @@ class Game2048 {
 
     renderBoard() {
         this.gameBoard.innerHTML = '';
-
         const tileDistance = this.tileSize + this.gap;
 
         for (let i = 0; i < this.size; i++) {
@@ -135,9 +135,8 @@ class Game2048 {
                 const posX = j * tileDistance;
                 const posY = i * tileDistance;
 
-                tile.style.transition = 'transform 0.15s ease, opacity 0.15s ease';
+                tile.style.transition = 'transform 0.1s ease, opacity 0.1s ease'; // Faster transition
 
-                // Ensure new tiles start with opacity 0 for fade-in
                 if (this.newTiles.has(`${i},${j}`)) {
                     tile.style.opacity = '0';
                     tile.classList.add('new');
@@ -150,12 +149,13 @@ class Game2048 {
                     const fromX = fromJ * tileDistance;
                     const fromY = fromI * tileDistance;
                     tile.style.transform = `translate(${fromX}px, ${fromY}px)`;
-                    requestAnimationFrame(() => {
+                    // Use setTimeout to ensure animation triggers
+                    setTimeout(() => {
                         tile.style.transform = `translate(${posX}px, ${posY}px)`;
                         if (this.newTiles.has(`${i},${j}`)) {
                             tile.style.opacity = '1';
                         }
-                    });
+                    }, 0);
                 } else if (this.mergedTiles.has(`${i},${j}`)) {
                     tile.style.transform = `translate(${posX}px, ${posY}px)`;
                     tile.classList.add('merged');
@@ -169,13 +169,13 @@ class Game2048 {
             }
         }
 
-        // Increased timeout to ensure animations complete
+        // Reduced timeout to match faster animation
         setTimeout(() => {
             this.movingTiles.clear();
             this.mergedTiles.clear();
             this.newTiles.clear();
-            this.isMoving = false;
-        }, 200);
+            this.isMoving = false; // Ensure flag is reset
+        }, 150); // Matches transition duration
     }
 
     addRandomTile(isNew = false) {
@@ -258,17 +258,16 @@ class Game2048 {
 
         if (moved) {
             this.board = newBoard;
-            this.updateScore(); // Update score display after move
+            this.updateScore();
             this.renderBoard();
-            setTimeout(() => this.addRandomTile(true), 200); // Match renderBoard timeout
-            // Check for 2048 win condition
+            setTimeout(() => this.addRandomTile(true), 150); // Match renderBoard timeout
             if (this.has2048()) {
-                setTimeout(() => this.showWin(), 300);
+                setTimeout(() => this.showWin(), 200);
             } else if (this.isGameOver()) {
-                setTimeout(() => this.showGameOver(), 300);
+                setTimeout(() => this.showGameOver(), 200);
             }
         } else {
-            this.isMoving = false;
+            this.isMoving = false; // Reset immediately if no move
         }
     }
 
